@@ -47,53 +47,80 @@ namespace LineBot_api.Service
                 switch (eventObject.Type)
                 {
                     case WebhookEventTypeEnum.Message:
+                        //var groupId = eventObject.Source.GroupId ?? eventObject.Source.RoomId;
+                        string userMessage = eventObject.Message.Text;
+                        List<TextMessageDto> messages = new List<TextMessageDto>();
+
+                        switch (userMessage)
+                        {
+                            case string message when message.Equals("Hello"):
+                                messages.Add(new TextMessageDto { Text = $"希望您今天過得愉快！" });
+                                break;
+
+                            case string message when message.Equals("群組"):
+                                var groupId = eventObject.Source.GroupId ?? eventObject.Source.RoomId;
+                                messages.Add(new TextMessageDto { Text = $"群組 ID 是：\"{groupId}\"。" });
+                                break;
+
+                            case string message when message.Equals("時間"):
+                                messages.Add(new TextMessageDto { Text = $"現在時間是：{DateTime.Now:HH:mm:ss}" });
+                                break;
+                            case string message when message.Equals("Echo"):
+                                messages.Add(new TextMessageDto { Text = $"您剛剛說了：\"{userMessage}\"" });
+                                break;
+
+                            default:
+                                // 預設回復
+                                break;
+                        }
+
+                        // 設定回覆訊息請求
                         var replyMessage = new ReplyMessageRequestDto<TextMessageDto>()
                         {
                             ReplyToken = eventObject.ReplyToken,
-                            Messages = new List<TextMessageDto>
-                            {
-                                new TextMessageDto(){Text = $"您好，您傳送了\"{eventObject.Message.Text}\"!"}
-                            }
+                            Messages = messages
                         };
+
+                        // 傳送回覆訊息
                         ReplyMessageHandler("text", replyMessage);
                         break;
-                    case WebhookEventTypeEnum.Unsend:
-                        Console.WriteLine($"使用者{eventObject.Source.UserId}在聊天室收回訊息！");
-                        break;
-                    case WebhookEventTypeEnum.Follow:
-                        Console.WriteLine($"使用者{eventObject.Source.UserId}將我們新增為好友！");
-                        break;
-                    case WebhookEventTypeEnum.Unfollow:
-                        Console.WriteLine($"使用者{eventObject.Source.UserId}封鎖了我們！");
-                        break;
-                    case WebhookEventTypeEnum.Join:
-                        Console.WriteLine("我們被邀請進入聊天室了！");
-                        break;
-                    case WebhookEventTypeEnum.Leave:
-                        Console.WriteLine("我們被聊天室踢出了");
-                        break;
-                    case WebhookEventTypeEnum.MemberJoined:
-                        string joinedMemberIds = "";
-                        foreach (var member in eventObject.Joined.Members)
-                        {
-                            joinedMemberIds += $"{member.UserId} ";
-                        }
-                        Console.WriteLine($"使用者{joinedMemberIds}加入了群組！");
-                        break;
-                    case WebhookEventTypeEnum.MemberLeft:
-                        string leftMemberIds = "";
-                        foreach (var member in eventObject.Left.Members)
-                        {
-                            leftMemberIds += $"{member.UserId} ";
-                        }
-                        Console.WriteLine($"使用者{leftMemberIds}離開了群組！");
-                        break;
-                    case WebhookEventTypeEnum.Postback:
-                        Console.WriteLine($"使用者{eventObject.Source.UserId}觸發了postback事件");
-                        break;
-                    case WebhookEventTypeEnum.VideoPlayComplete:
-                        Console.WriteLine($"使用者{eventObject.Source.UserId}");
-                        break;
+                        //case WebhookEventTypeEnum.Unsend:
+                        //    Console.WriteLine($"使用者{eventObject.Source.UserId}在聊天室收回訊息！");
+                        //    break;
+                        //case WebhookEventTypeEnum.Follow:
+                        //    Console.WriteLine($"使用者{eventObject.Source.UserId}將我們新增為好友！");
+                        //    break;
+                        //case WebhookEventTypeEnum.Unfollow:
+                        //    Console.WriteLine($"使用者{eventObject.Source.UserId}封鎖了我們！");
+                        //    break;
+                        //case WebhookEventTypeEnum.Join:
+                        //    Console.WriteLine("我們被邀請進入聊天室了！");
+                        //    break;
+                        //case WebhookEventTypeEnum.Leave:
+                        //    Console.WriteLine("我們被聊天室踢出了");
+                        //    break;
+                        //case WebhookEventTypeEnum.MemberJoined:
+                        //    string joinedMemberIds = "";
+                        //    foreach (var member in eventObject.Joined.Members)
+                        //    {
+                        //        joinedMemberIds += $"{member.UserId} ";
+                        //    }
+                        //    Console.WriteLine($"使用者{joinedMemberIds}加入了群組！");
+                        //    break;
+                        //case WebhookEventTypeEnum.MemberLeft:
+                        //    string leftMemberIds = "";
+                        //    foreach (var member in eventObject.Left.Members)
+                        //    {
+                        //        leftMemberIds += $"{member.UserId} ";
+                        //    }
+                        //    Console.WriteLine($"使用者{leftMemberIds}離開了群組！");
+                        //    break;
+                        //case WebhookEventTypeEnum.Postback:
+                        //    Console.WriteLine($"使用者{eventObject.Source.UserId}觸發了postback事件");
+                        //    break;
+                        //case WebhookEventTypeEnum.VideoPlayComplete:
+                        //    Console.WriteLine($"使用者{eventObject.Source.UserId}");
+                        //    break;
                 }
             }
             return new MidReturn { msg = "0000" };
